@@ -1,0 +1,81 @@
+#include<stdlib.h>
+#include<stdio.h>
+#include<conio.h>
+#include<math.h>
+#include<glut.h>
+
+void myinit()
+{
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-5, 5, -5, 5, -10, 10);
+	glMatrixMode(GL_MODELVIEW);
+}
+void drawtable()
+{
+	//table top 
+	glPushMatrix();
+	glTranslatef(0, 0.025, 0);
+	glScalef(1, 0.05, 1);
+	glutSolidCube(1);
+	glPopMatrix();
+	//1 st leg 
+	glPushMatrix();
+	glTranslatef(-0.5, -0.5, -0.5);
+	glScalef(0.05, 1, 0.05);
+	glutSolidCube(1);
+	glPopMatrix();
+	//2nd leg
+	glPushMatrix();
+	glTranslatef(0.5, -0.5, -0.5);
+	glScalef(0.05, 1, 0.05);
+	glutSolidCube(1);
+	glPopMatrix();
+	// 3rd leg 
+	glPushMatrix();
+	glTranslatef(-0.5, -0.5, 0.5);
+	glScalef(0.05, 1, 0.05);
+	glutSolidCube(1);
+	glPopMatrix();
+	//4 th leg
+	glPushMatrix();
+	glTranslatef(0.5, -0.5, 0.5);
+	glScalef(0.05, 1, 0.05);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//tea pot 
+	glPushMatrix();
+	glTranslatef(0, 0.25, 0);
+	glutSolidTeapot(0.25);
+	glPopMatrix();
+}
+void display()
+{
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	GLfloat mat_ambient[] = { .7,.7,.7,1 };
+	GLfloat lightpos[] = { 2,2,2 };
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+
+	gluLookAt(4, 1, 4, 1, 0, 1, 0, 1, 0);
+	drawtable();
+	glFlush();
+}
+void main()
+{
+	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+	glutInitWindowSize(500, 500);
+	glutCreateWindow("Scene");
+	myinit();
+
+	glutDisplayFunc(display);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_DEPTH_TEST);
+	glLoadIdentity();
+	glutMainLoop();
+}
