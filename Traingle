@@ -1,0 +1,58 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<glut.h>
+#include<math.h>
+float p[9][2] = { {20,20},{40,40},{60,20} };
+float theta, xp, yp;
+void myinit()
+{
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(-100, 100, -100, 100);
+	glMatrixMode(GL_MODELVIEW);
+}
+void drawtrai()
+{
+	glBegin(GL_TRIANGLES);
+	glVertex2fv(p[0]);
+	glVertex2fv(p[1]);
+	glVertex2fv(p[2]);
+	glEnd();
+
+
+}
+void display()
+{
+	glClearColor(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0, 0, 1);
+	drawtrai();
+
+	for (int i = 0; i < 3; i++)
+	{
+	p[i][0] = (p[i][0] - xp) * cos(theta) - (p[i][1] -yp) * sin(theta) + xp;
+	p[i][1] = (p[i][0] - xp)*sin(theta) + (p[i][1] -yp) * cos(theta) + yp;
+}
+
+	glColor3f(0, 1, 0);
+	drawtrai();
+	glFlush();
+
+}
+
+int main()
+{
+	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+	glutInitWindowSize(500, 500);
+	glutCreateWindow("rotation");
+	myinit();
+	printf_s("enter the angale of rotation\n");
+	scanf_s("%f", &theta);
+	printf_s("enter the fixed point for rotation\n");
+	scanf_s("%f%f", &xp, &yp);
+
+	glutDisplayFunc(display);
+
+	glutMainLoop();
+
+}
