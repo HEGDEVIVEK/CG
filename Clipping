@@ -1,0 +1,157 @@
+#include <stdio.h> 
+#include <glut.h> 
+//define opcode int 
+
+float xmin, xmax, uxmin, uxmax, ymin, ymax, uymin, uymax, x1, y1, x2, y2;;
+enum { top = 0x8, bottom = 0x4, right = 0x2, left = 0x1 };
+
+void myinit()
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, 500, 0, 500);
+    glMatrixMode(GL_MODELVIEW);
+}
+int opcodegen(int x, int y)
+{
+    int p = 0;
+    if (x < xmin)p = p | left;
+    if (x > xmax)p = p | right;
+    if (y < ymin)p = p | bottom;
+    if (y > ymax)p = p | top;
+    return p;
+}
+
+void suther()
+{
+    int p1, p2, p, m, x, y;
+    p1 = opcodegen(x1, y1);
+    p2 = opcodegen(x2, y2);
+
+    bool done = false, accept = false;
+
+    while (!done)
+    {
+        if ((p1 | p2) == 0)
+        {
+            done = true;
+            accept = true;
+        }
+        else if ((p1 & p2) != 0)
+        {
+            done = true;
+        }
+        else
+        {
+            m = (y2 - y1) / (x2 - x1);
+            p = p1 != 0 ? p1 : p2;
+
+            if ((p & left) != 0)
+            {
+                x = xmin;
+                y = y1 + (xmin - x1) * m;
+            }
+
+            if ((p & bottom) != 0)
+            {
+                y = ymin;
+                x = x1 + (ymin - y1)/m;
+            }
+
+            if ((p & right) != 0)
+            {
+                x = xmax;
+                y = y1 + (xmax - x1) * m;
+            }
+
+            if ((p & top) != 0)
+            {
+                y = ymax;
+                x = x1 + (ymax - y1)/m;
+            }
+            if (p == p1)
+            {
+                x1 = x;
+                y1 = y;
+                p1 = opcodegen(x1, y1);
+            }
+            if (p == p2)
+            {
+                x2 = x;
+                y2 = y;
+                p2 = opcodegen(x2, y2);
+            }
+        }
+    }
+    if (accept)
+    {
+        int sx = 1;
+        int sy = 1;
+        x1 = sx * (x1 -xmin) +uxmin;
+        x2 = sx * (x2 - xmin) + uxmin;
+        y1= sy * (y1 - ymin) + uymin;
+        y2 = sy * (y2 - ymin) + uymin;
+        
+
+        glBegin(GL_LINES);
+        glVertex2f(x1, y1);
+        glVertex2f(x2, y2);
+        glEnd();
+        glFlush();
+    }
+
+}
+
+void display()
+{
+    glClearColor(1, 1, 1, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glColor3f(1, 0, 0);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(xmin, ymin);
+    glVertex2f(xmin, ymax);
+    glVertex2f(xmax, ymax);
+    glVertex2f(xmax, ymin);
+    glEnd();
+
+    glColor3f(0, 1, 0);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(uxmin, uymin);
+    glVertex2f(uxmin, uymax);
+    glVertex2f(uxmax, uymax);
+    glVertex2f(uxmax, uymin);
+    glEnd();
+
+    glColor3f(0, 0, 1);
+    glBegin(GL_LINES);
+    glVertex2f(x1, y1);
+    glVertex2f(x2, y2);
+    glEnd();
+
+    suther();
+
+    glFlush();
+}
+
+int main()
+{
+    glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+    glutInitWindowSize(1000, 1000);
+    glutCreateWindow("suther");
+    myinit();
+
+    printf("enter the windoe co oedinates\n");
+    scanf_s("%f%f%f%f", &xmin, &ymin, &xmax, &ymax);
+
+    printf("enter the view port co oedinates\n");
+    scanf_s("%f%f%f%f", &uxmin, &uymin, &uxmax, &uymax);
+
+    printf("enter the line co ordinates\n");
+    scanf_s("%f%f%f%f", &x1, &y1, &x2, &y2);
+
+
+    glutDisplayFunc(display);
+    glutMainLoop();
+
+}
